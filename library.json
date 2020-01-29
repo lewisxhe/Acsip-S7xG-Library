@@ -1,0 +1,20 @@
+{
+    "name": "Acsip S7xG Library",
+    "description": "Acsip S76G/78G UART firmware communication library",
+    "keywords": "lorawan,gps,rf,s76g,s78g,esp32,acsip",
+    "authors": [
+        {
+            "name": "Lewis He",
+            "email": "lewishe@outlook.com",
+            "url": "https://github.com/lewisxhe/Acsip-S7xG-Library",
+            "maintainer": true
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lewisxhe/Acsip-S7xG-Library"
+    },
+    "version": "1.0.0",
+    "homepage": "https://github.com/lewisxhe/Acsip-S7xG-Library",
+    "frameworks": "Arduino"
+}
