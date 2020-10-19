@@ -5,7 +5,7 @@ git clone https://github.com/ElectronicCats/CayenneLPP.git
 git clone https://github.com/bblanchon/ArduinoJson.git
 */
 
-#include <TTGO.h>
+#include "config.h"
 #include <acsip.h>
 #include "acsiplogo.h"
 #include <CayenneLPP.h>
@@ -33,7 +33,7 @@ const char *deveui = "your ttn deveui";
 const char *appeui = "your ttn appeui";
 const char *devadr = "your ttn devaddr";
 const char *nwskey = "your ttn network session key";
-const char *appskey ="your ttn app session key";
+const char *appskey = "your ttn app session key";
 
 int ret = 0;
 
@@ -54,7 +54,7 @@ void setupWatch()
 
     watch = TTGOClass::getWatch();
     watch->begin();
-    tft = watch->eTFT;
+    tft = watch->tft;
 
     tft->fillScreen(TFT_BLACK);
 
@@ -127,7 +127,7 @@ void lorawanBegin()
     char cla =  s76g.getClass();
     Serial.printf("getClass -> %c\n", cla);
 
-    //Set Class A 
+    //Set Class A
     ret = s76g.setClass('A');
     CHECK_ERROR(ret);
 

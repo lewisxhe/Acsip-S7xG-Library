@@ -5,7 +5,7 @@ git clone https://github.com/ElectronicCats/CayenneLPP.git
 git clone https://github.com/bblanchon/ArduinoJson.git
 */
 
-#include <TTGO.h>
+#include "config.h"
 #include <acsip.h>
 #include "acsiplogo.h"
 #include <CayenneLPP.h>
@@ -51,7 +51,7 @@ void setupWatch()
 
     watch = TTGOClass::getWatch();
     watch->begin();
-    tft = watch->eTFT;
+    tft = watch->tft;
 
     tft->fillScreen(TFT_BLACK);
 

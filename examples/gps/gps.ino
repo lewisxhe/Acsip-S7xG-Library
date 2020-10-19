@@ -1,4 +1,4 @@
-#include <TTGO.h>
+#include "config.h"
 #include <acsip.h>
 #include "acsiplogo.h"
 
@@ -36,7 +36,7 @@ void setupWatch()
 
     watch = TTGOClass::getWatch();
     watch->begin();
-    tft = watch->eTFT;
+    tft = watch->tft;
 
     tft->fillScreen(TFT_BLACK);
 
@@ -105,8 +105,8 @@ void setupWatch()
 }
 
 void gpsBegin()
-{   
-    // To reset GPS 
+{
+    // To reset GPS
     ret = s76g.gpsReset();
     CHECK_ERROR(ret);
 
@@ -121,7 +121,7 @@ void gpsBegin()
     ret = s76g.setStart(S7XG_GPS_START_HOT);
     CHECK_ERROR(ret);
 
-    //representing S76G/S78G GPS satellite system is set to either 
+    //representing S76G/S78G GPS satellite system is set to either
     // S7XG_SATELLITE_GPS
     // S7XG_SATELLITE_GPS_GLONASS
     ret = s76g.setSatelliteSystem(S7XG_SATELLITE_GPS);
