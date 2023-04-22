@@ -10,13 +10,6 @@ Acsip s76g;
 struct GPSDataStruct data;
 uint32_t utimerStart = 0;
 
-#define CHECK_ERROR(ret)        do{                                                     \
-                                    if(ret != S7XG_OK){                                 \
-                                        Serial.printf("%d failed\n", __LINE__);         \
-                                        while (1);                                      \
-                                    }                                                   \
-                                }while(0)
-
 int ret = 0;
 
 void showResult(bool r)
@@ -108,45 +101,45 @@ void gpsBegin()
 {
     // To reset GPS
     ret = s76g.gpsReset();
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     // Representing whether S76G enables the internal level shift IC
     ret = s76g.setLevelShift(true);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     // Representing the way of how S76G/S78G starts to get position
     // S7XG_GPS_START_HOT
     // S7XG_GPS_START_WARM
     // S7XG_GPS_START_COLD
     ret = s76g.setStart(S7XG_GPS_START_HOT);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     //representing S76G/S78G GPS satellite system is set to either
     // S7XG_SATELLITE_GPS
     // S7XG_SATELLITE_GPS_GLONASS
     ret = s76g.setSatelliteSystem(S7XG_SATELLITE_GPS);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     //Representing the SONY CXD5603GF GPS positioning cycle time,
     //it can be 1000 to 600000 milliseconds.
     ret = s76g.setPositioningCycle(1000);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     // Representing S76G/S78G GPS mode is set to either
     // S7XG_GPS_MODE_AUTO,
     // S7XG_GPS_MODE_MANUAL,
     // S7XG_GPS_MODE_IDLE,
     ret = s76g.setMode(S7XG_GPS_MODE_MANUAL);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     GPSModeStruct mode;
     ret = s76g.getMode(mode);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     //To show the TTFF (Time To First Fix) value of the last GPS positioning.
     float sec = 0;
     ret = s76g.getTtff(sec);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
     Serial.printf("TTFF is %f\n", sec);
 }
 

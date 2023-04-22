@@ -21,12 +21,7 @@ CayenneLPP lpp(160);
 struct GPSDataStruct data;
 uint32_t utimerStart = 0;
 
-#define CHECK_ERROR(ret)        do{                                                     \
-                                    if(ret != S7XG_OK){                                 \
-                                        Serial.printf("%d failed\n", __LINE__);         \
-                                        while (1);                                      \
-                                    }                                                   \
-                                }while(0)
+
 
 
 const char *deveui = "your ttn deveui";
@@ -129,26 +124,26 @@ void lorawanBegin()
 
     //Set Class A
     ret = s76g.setClass('A');
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     bool isJoin = s76g.isJoin();
     Serial.printf("S76G is %s\n", isJoin ? "joined" : "unjoined");
 
     int pwr = 0;
     ret = s76g.getPower(pwr);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
     Serial.printf("S76G power level is %d\n", pwr);
 
     //Set Device Address
     ret = s76g.setDevAddr(devadr);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     //Set Network Session Key
     ret = s76g.setNetworkSessionKey(nwskey);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
     //Set App Session Key
     ret = s76g.setAppSessionKey(appskey);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     //Set the corresponding channel frequency
     s76g.setChannelFreq(0, 868100000);

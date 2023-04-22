@@ -7,12 +7,7 @@ TFT_eSPI *tft;
 HardwareSerial *hwSerial = nullptr;
 Acsip s76g;
 
-#define CHECK_ERROR(ret)        do{                                                     \
-                                    if(ret != S7XG_OK){                                 \
-                                        Serial.printf("%d failed\n", __LINE__);         \
-                                        while (1);                                      \
-                                    }                                                   \
-                                }while(0)
+
 
 int ret = 0;
 
@@ -119,30 +114,30 @@ void rfBegin()
 
     uint32_t freq = 0;
     ret = s76g.getRfFreq(freq);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     //Representing communication frequency in Hz, it can be values from 862000000 to 932000000 (S76S); 137000000 to 525000000 (S78S).
     freq = 915000000;
     ret = s76g.setRfFreq(freq);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     ret = s76g.getRfFreq(freq);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
     Serial.printf("freq = %u\n", freq);
 
 
     //Representing transmitting power in dBm, it can be from 2 to 20.
     uint8_t dBm = 20;
     ret = s76g.setRfPower(dBm);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 
     ret = s76g.getRfPower(dBm);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
     Serial.printf("dBm = %u\n", dBm);
 
     uint8_t sf = 0;
     s76g.getRfSpreadingFactor(sf);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
     Serial.printf("SpreadingFactor = %u\n", sf);
 
     //Representing signal bandwidth in kHz, it can be: 125, 250, 500.
@@ -151,7 +146,7 @@ void rfBegin()
 
     //Turn off continuous reception mode
     ret = s76g.setReceiveContinuous(false);
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
 }
 
 
@@ -164,7 +159,7 @@ void setup()
 void loop()
 {
     ret = s76g.RfSendString("hello world");
-    CHECK_ERROR(ret);
+    ACSIP_CHECK_ERROR(ret);
     delay(10000);
 }
 

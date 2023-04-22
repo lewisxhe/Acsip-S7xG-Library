@@ -27,6 +27,14 @@
 #define OUTPUT            0x02
 #endif
 
+#define ACSIP_CHECK_ERROR(ret)                                          \
+                do{                                                     \
+                    if(ret != S7XG_OK){                                 \
+                        Serial.printf("[%lu]:%s %d line failed,error code:%s\n",millis(),__FILE__, __LINE__,Acsip::errrToString(ret).c_str());         \
+                        while (1);                                      \
+                    }                                                   \
+                }while(0)
+
 
 #define STRNCMP_FULLSTRING(str)   (strncmp(ptr, str, strlen(str)) == 0)
 
