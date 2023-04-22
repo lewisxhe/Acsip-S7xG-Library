@@ -17,7 +17,7 @@
 // #define DEBUG_SERIAL_HEX
 
 
-#define DEFAULT_SERIAL_TIMEOUT          3000
+#define DEFAULT_SERIAL_TIMEOUT          10000
 
 #ifndef INPUT
 #define INPUT             0x01
@@ -44,6 +44,9 @@ enum S7XG_Error {
     S7XG_GPS_NOT_INIT,
     S7XG_GPS_NOT_POSITIONING,
     S7XG_GPS_SUCCESS,
+    S7XG_GPS_ERROR,
+    S7XG_COMMAND_ERROR,
+    S7XG_UNKONW,
 };
 
 enum GPIOGroup {
@@ -126,6 +129,11 @@ enum MacJoin {
     S7XG_MAC_MAX
 };
 
+enum AcsipFwVer {
+    ACSIP_FW_VERSION_V165G9,
+    ACSIP_FW_VERSION_V166G11,
+};
+
 struct GPSModeStruct {
     GPSMode mode;
     GPSStartMode start;
@@ -194,12 +202,15 @@ typedef void (*rf_callback)(const char *data, int rssi, int snr);
 class Acsip
 {
 public:
+    static String errrToString(int err_code);
+
 
     bool begin(HardwareSerial &port);
 
     /*****************************************
      *          SIP FUNCTION
      ****************************************/
+
     void reset();
     const char *getModel();
     const char *factoryReset();
@@ -309,7 +320,7 @@ public:
     /*****************************************
      *          RF FUNCTION
      ****************************************/
-    //Representing communication frequency in Hz, 
+    //Representing communication frequency in Hz,
     // it can be values from 862000000 to 932000000 (S76S); 137000000 to 525000000 (S78S).
     int setRfFreq(uint32_t freq);
 
@@ -403,13 +414,14 @@ private:
     inline bool cmpstr(const char *str) __attribute__((always_inline));
     inline void sendCmd(const char *cmd) __attribute__((always_inline));
 
-    int waitForAck(char *ack);
+    int waitForAck(char *ack, uint32_t timeout = 0);
 
-    char buffer[256];
+    char            buffer[256];
     HardwareSerial *_port;
-    bool isHardwareSerial = false;
+    bool            isHardwareSerial = false;
 
-    uint32_t _timeout;
-    rf_callback _rf_callback = nullptr;
+    uint32_t        _timeout;
+    rf_callback     _rf_callback = nullptr;
+    int          version;
 
 };

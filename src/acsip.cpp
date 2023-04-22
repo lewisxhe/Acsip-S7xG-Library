@@ -7,6 +7,45 @@
 
 static const char *rxTxMode[2] = {"cycle", "no_cycle"};
 
+
+String Acsip::errrToString(int err_code)
+{
+    switch (err_code) {
+    case S7XG_OK:
+        return "OK";
+    case S7XG_FAILED:
+        return "Failed";
+    case S7XG_TIMEROUT:
+        return "Timeout";
+    case S7XG_JOINED:
+        return "Joined";
+    case S7XG_UNJOINED:
+        return "UnJoined";
+    case S7XG_INVALD:
+        return "Command invald";
+    case S7XG_ALREADY_JOINED:
+        return "Already Joined";
+    case S7XG_BUSY:
+        return "Busy";
+    case S7XG_INVALD_LEN:
+        return "Invald len";
+    case S7XG_GPS_NOT_INIT:
+        return "Not init";
+    case S7XG_GPS_NOT_POSITIONING:
+        return "Positioning";
+    case S7XG_GPS_SUCCESS:
+        return "Success";
+    case S7XG_GPS_ERROR:
+        return "GPS Connect Error";
+    case S7XG_COMMAND_ERROR:
+        return "Unknown command!";
+    default:
+        break;
+    }
+    return "Unkonw";
+}
+
+
 static int hexToString(const char *src, uint8_t *dst, size_t srcLen, size_t &dstLen)
 {
     if (src == NULL) {
@@ -137,8 +176,14 @@ int Acsip::universalSendCmd(const char *cmd)
         return S7XG_OK;
     } else if (cmpstr("Invalid")) {
         return S7XG_INVALD;
+    } else if (cmpstr("Please disconnect UART4 TX/RX")) {
+        return S7XG_GPS_ERROR;
+    } else if (cmpstr("Unknown command!")) {
+        return S7XG_COMMAND_ERROR;
     }
-    return S7XG_FAILED;
+
+
+    return S7XG_UNKONW;
 }
 
 void Acsip::setTimeout(uint32_t cycle)
@@ -157,7 +202,7 @@ void Acsip::sendCmd(const char *cmd)
     DEBUGLN(cmd);
 }
 
-int Acsip::waitForAck(char *ack)
+int Acsip::waitForAck(char *ack, uint32_t timeout)
 {
     uint8_t serial_buffer[256] = {0};
     int i = 0;
@@ -177,19 +222,31 @@ int Acsip::waitForAck(char *ack)
             DEBUG(",");
 #endif
 #endif
-
+            //respone command prefix [\n\r>>]
+            //respone command suffix [\n]
             if (serial_buffer[0] == 0xA && serial_buffer[1] == 0xD &&
                     serial_buffer[2] == 0x3E && serial_buffer[3] == 0x3E
                     && serial_buffer[i] == 0xA) {
                 memcpy(ack, &serial_buffer[5], i - 5);
                 ack[i - 5] = '\0';
-                // Serial.printf("Recvicer Done .. [size:%d] -> %s\n", i - 5, ack);
+#ifdef DEBUG_PORT
+                DEBUG_PORT.printf("Recvicer Done .. [size:%d] -> %s\n", i - 5, ack);
+#endif
                 return S7XG_OK;
             }
             i++;
         }
-        if (millis() - utimerStart > _timeout) {
+        if (millis() - utimerStart > timeout != 0 ? timeout :  _timeout) {
             DEBUGLN(".");
+#ifdef DEBUG_PORT
+            DEBUG_PORT.println("Time out flush uart!");
+            _port->flush();
+            while (_port->available()) {
+                char c = _port->read();
+                DEBUG_PORT.print(c);
+            }
+            DEBUG_PORT.println();
+#endif
             break;
         }
     }
@@ -204,20 +261,25 @@ bool Acsip::begin(HardwareSerial &port)
     _timeout = DEFAULT_SERIAL_TIMEOUT;
 
     sendCmd("rf rx_con off");
-    waitForAck(buffer);
+    waitForAck(buffer, 2000);
 
     sendCmd("rf lora_tx_stop");
-    waitForAck(buffer);
+    waitForAck(buffer, 2000);
 
     sendCmd("rf lora_rx_stop");
-    waitForAck(buffer);
-    waitForAck(buffer);
-
+    waitForAck(buffer, 2000);
+    waitForAck(buffer, 2000);
 
     reset();
 
     String model = getModel();
     if (model == "S76G" || model == "S78G") {
+        getVersion();
+        if (cmpstr("v1.6.6-g11")) {
+            version = ACSIP_FW_VERSION_V166G11;
+        } else if (cmpstr("v1.6.5-g9")) {
+            version = ACSIP_FW_VERSION_V165G9;
+        }
         return true;
     }
     return false;
