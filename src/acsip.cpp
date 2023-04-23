@@ -386,7 +386,7 @@ static const char grp[7] = {'A', 'B', 'C', 'D', 'E', 'F', 'H'};
 int Acsip::setGPIOMode(GPIOGroup group, int pin, int mode)
 {
     if (pin <= 0 && pin > 16) return S7XG_INVALD;
-    char m = (mode & INPUT) ? '0' : '1';
+    char m = (mode == INPUT) ? '0' : '1';
     snprintf(buffer, sizeof(buffer), "sip set_gpio_mode %c %d %c", grp[group], pin, m);
     return universalSendCmd(buffer);
 }
